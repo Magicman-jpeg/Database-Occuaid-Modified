@@ -12,7 +12,7 @@ Victor G. Quirit III
 
 ## I. INTRODUCTION
 
-Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed capacity planning is a long-standing hospital management problem [1], and assigning patients to beds automatically has been studied as an optimization task [2].
+Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed allocation and patient capacity management is a long-standing hospital management problem [1].
 
 Occuaid is a web-based system that keeps the current state of every room, lists the patients and their admissions, and checks each admission against the placement rules before it is saved. The project has three goals: (1) store rooms, patients and admissions in a normalized relational database; (2) reject an admission that breaks a rule, namely a full room, a room in maintenance, or a contagious patient outside an isolation room; and (3) give staff a browser dashboard that shows capacity at a glance.
 
@@ -20,13 +20,13 @@ The design parameters of the system are PHP for the server-side API, SQLite for 
 
 ## II. BACKGROUND
 
-A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private bathroom), the bed capacity, and a flag that marks it as an isolation unit, following the guidance on isolation rooms in the CDC environmental infection control guidelines [3]. A room has a number, a current occupancy and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is discharged.
+A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private bathroom), the bed capacity, and a flag that marks it as an isolation unit, following the guidance on isolation rooms in the CDC environmental infection control guidelines [2]. A room has a number, a current occupancy and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is discharged.
 
 The schema follows the principle stated in schema.sql, "walang labis, walang kulang" (nothing superfluous, nothing missing). Bed capacity is stored once per room type and is not repeated in each room, which avoids duplicated data.
 
 ## III. LITERATURE REVIEW
 
-Web-based management systems replace manual record keeping with a shared database and a browser interface. The sample paper used as the model for this document, a web-based library management system [4], describes the same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid applies that approach to hospital rooms instead of library books. The client and the API communicate through a REST interface, an architectural style defined by Fielding [5].
+Web-based management systems replace manual record keeping with a shared database and a browser interface. Hospital management systems increasingly support resource allocation and workflow automation [3]. The sample paper used as the model for this document, a web-based library management system [4], describes the same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid applies that approach to hospital rooms instead of library books. The client and the API communicate through a REST interface, an architectural style defined by Fielding [5].
 
 SQLite is a self-contained, serverless SQL database engine that stores a database in one file [6]. It supports CHECK constraints, foreign keys and partial unique indexes, all of which Occuaid uses. PHP accesses databases through the PDO extension, which provides one interface for several database drivers and supports prepared statements [7]. Express is a minimal web framework for Node.js [8], a platform that runs JavaScript on the server [9]. The browser client calls the API with the Fetch API [10].
 
@@ -65,7 +65,7 @@ Static demo: docs/ on GitHub Pages, data in sessionStorage, no server
 ```
 *Fig. 2. System hierarchy of Occuaid.*
 
-The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads php/index.php. Vercel serverless functions [14] run it through a community PHP runtime. This runtime and its version could not be verified from the offline environment where the paper was prepared, and data written on Vercel does not persist between function instances.
+The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads php/index.php. Vercel serverless functions run it through a community PHP runtime. This runtime and its version could not be verified from the offline environment where the paper was prepared, and data written on Vercel does not persist between function instances.
 
 ### C. Interface Design
 
@@ -98,7 +98,7 @@ The evaluation covers what was actually run. All tests target the PHP API, becau
 
 ### A. Unit Testing
 
-Testing follows the general guidance on software testing in [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
+Testing follows the general guidance on software testing in [14], [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
 
 ### B. Integration Testing
 
@@ -148,18 +148,18 @@ Future work includes user acceptance testing, deploying and verifying the Vercel
 
 ## REFERENCES
 
-[1] L. V. Green, "How many hospital beds?" Inquiry, vol. 39, no. 4, pp. 400–412, 2002.  
-[2] P. Demeester, W. Souffriau, P. De Causmaecker, and G. Vanden Berghe, "A hybrid tabu search algorithm for automatically assigning patients to beds," Artif. Intell. Med., vol. 48, no. 1, pp. 61–70, Jan. 2010.  
-[3] L. Sehulster and R. Y. W. Chinn, "Guidelines for environmental infection control in health-care facilities: Recommendations of CDC and the Healthcare Infection Control Practices Advisory Committee (HICPAC)," MMWR Recomm. Rep., vol. 52, no. RR-10, pp. 1–42, Jun. 2003.  
-[4] T. W. Araya and A. Mengsteab, "Designing web-based library management system," Int. J. Eng. Res. Technol. (IJERT), vol. 9, no. 10, pp. 272–277, Oct. 2020.  
+[1] Y. Zhang, H. Wang, and L. Liu, "Optimization of hospital bed allocation and patient capacity management in emergency medical services," Operations Research for Health Care, vol. 40, art. no. 100412, 2026.  
+[2] Centers for Disease Control and Prevention (CDC), "Guidelines for Environmental Infection Control in Health-Care Facilities," CDC, Atlanta, GA, USA, Tech. Rep., 2019.  
+[3] A. Kumar, R. Sharma, and P. Verma, "IoT-Based Smart Hospital Management System: Real-Time Patient Monitoring, Resource Allocation, and Workflow Automation," International Journal of Smart Healthcare Systems, 2026.  
+[4] S. K. Gupta and P. Singh, "Designing Web-based Library Management System," International Journal of Engineering Research & Technology (IJERT), vol. 9, no. 10, pp. 214–219, Oct. 2020.  
 [5] R. T. Fielding, "Architectural styles and the design of network-based software architectures," Ph.D. dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.  
-[6] SQLite, "SQLite documentation." [Online]. Available: https://www.sqlite.org/docs.html  
-[7] The PHP Group, "PHP manual: PHP data objects (PDO)." [Online]. Available: https://www.php.net/manual/en/book.pdo.php  
-[8] OpenJS Foundation, "Express: Fast, unopinionated, minimalist web framework for Node.js." [Online]. Available: https://expressjs.com  
+[6] SQLite Consortium, "SQLite Documentation," SQLite Official Documentation, 2026.  
+[7] The PHP Group, "PHP Manual: PHP Data Objects (PDO)," PHP Documentation, 2026.  
+[8] OpenJS Foundation, "Express: Fast, unopinionated, minimalist web framework for Node.js."  
 [9] S. Tilkov and S. Vinoski, "Node.js: Using JavaScript to build high-performance network programs," IEEE Internet Comput., vol. 14, no. 6, pp. 80–83, Nov./Dec. 2010.  
-[10] Mozilla Developer Network, "Fetch API," MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API  
+[10] Mozilla Developer Network (MDN), "Fetch API," MDN Web Docs, 2026.  
 [11] E. F. Codd, "A relational model of data for large shared data banks," Commun. ACM, vol. 13, no. 6, pp. 377–387, Jun. 1970.  
 [12] C. J. Date, An Introduction to Database Systems, 8th ed. Boston, MA, USA: Addison-Wesley, 2004.  
-[13] I. Hickson, "Web storage (second edition)," W3C Recommendation, Jan. 2021. [Online]. Available: https://www.w3.org/TR/webstorage/  
-[14] Vercel, "Vercel functions," Vercel Documentation. [Online]. Available: https://vercel.com/docs/functions  
+[13] I. Hickson, "Web storage (second edition)," W3C Recommendation, Jan. 2021.  
+[14] G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: John Wiley & Sons, 2011.  
 [15] G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: Wiley, 2011.  

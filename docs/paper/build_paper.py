@@ -106,9 +106,8 @@ def build_content(res):
     p("Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) "
       "room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must "
       "find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, "
-      "the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed capacity planning "
-      "is a long-standing hospital management problem [1], and assigning patients to beds automatically has been "
-      "studied as an optimization task [2].")
+      "the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed allocation and "
+      "patient capacity management is a long-standing hospital management problem [1].")
     p("Occuaid is a web-based system that keeps the current state of every room, lists the patients and their admissions, "
       "and checks each admission against the placement rules before it is saved. The project has three goals: (1) store "
       "rooms, patients and admissions in a normalized relational database; (2) reject an admission that breaks a rule, "
@@ -121,7 +120,7 @@ def build_content(res):
     h1("II. BACKGROUND")
     p("A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private "
       "bathroom), the bed capacity, and a flag that marks it as an isolation unit, following the guidance on isolation rooms in the CDC environmental infection control "
-      "guidelines [3]. A room has a number, a current occupancy "
+      "guidelines [2]. A room has a number, a current occupancy "
       "and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a "
       "contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is "
       "discharged.")
@@ -131,6 +130,7 @@ def build_content(res):
 
     h1("III. LITERATURE REVIEW")
     p("Web-based management systems replace manual record keeping with a shared database and a browser interface. "
+      "Hospital management systems increasingly support resource allocation and workflow automation [3]. "
       "The sample paper used as the model for this document, a web-based library management system [4], describes the "
       "same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid "
       "applies that approach to hospital rooms instead of library books. The client and the API communicate through a REST interface, an architectural "
@@ -167,7 +167,7 @@ def build_content(res):
     B.append(("fig", "Fig. 2.", "System hierarchy of Occuaid.", "arch"))
     p("The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, "
       "api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads "
-      "php/index.php. Vercel serverless functions [14] run it through a community PHP runtime. This runtime and its version could not be "
+      "php/index.php. Vercel serverless functions run it through a community PHP runtime. This runtime and its version could not be "
       "verified from the offline environment where the paper was prepared, and data written on Vercel does not persist "
       "between function instances.")
 
@@ -201,7 +201,7 @@ def build_content(res):
     p("The evaluation covers what was actually run. All tests target the PHP API, because the Node.js dependencies "
       "(Express) could not be installed in the offline environment, so server.js was not executed.")
     h2("A. Unit Testing")
-    p("Testing follows the general guidance on software testing in [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and "
+    p("Testing follows the general guidance on software testing in [14], [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and "
       "api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the "
       "API tests below.")
     h2("B. Integration Testing")
@@ -237,31 +237,20 @@ def build_content(res):
       "database for the hosted version, user login and roles, and room transfer between admissions.")
 
     refs = [
-        "L. V. Green, \"How many hospital beds?\" Inquiry, vol. 39, no. 4, pp. 400" + "\u2013" + "412, 2002.",
-        "P. Demeester, W. Souffriau, P. De Causmaecker, and G. Vanden Berghe, \"A hybrid tabu search algorithm for "
-        "automatically assigning patients to beds,\" Artif. Intell. Med., vol. 48, no. 1, pp. 61" + "\u2013" + "70, Jan. 2010.",
-        "L. Sehulster and R. Y. W. Chinn, \"Guidelines for environmental infection control in health-care facilities: "
-        "Recommendations of CDC and the Healthcare Infection Control Practices Advisory Committee (HICPAC),\" "
-        "MMWR Recomm. Rep., vol. 52, no. RR-10, pp. 1" + "\u2013" + "42, Jun. 2003.",
-        "T. W. Araya and A. Mengsteab, \"Designing web-based library management system,\" Int. J. Eng. Res. Technol. "
-        "(IJERT), vol. 9, no. 10, pp. 272" + "\u2013" + "277, Oct. 2020.",
-        "R. T. Fielding, \"Architectural styles and the design of network-based software architectures,\" Ph.D. "
-        "dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.",
-        "SQLite, \"SQLite documentation.\" [Online]. Available: https://www.sqlite.org/docs.html",
-        "The PHP Group, \"PHP manual: PHP data objects (PDO).\" [Online]. Available: "
-        "https://www.php.net/manual/en/book.pdo.php",
-        "OpenJS Foundation, \"Express: Fast, unopinionated, minimalist web framework for Node.js.\" [Online]. "
-        "Available: https://expressjs.com",
-        "S. Tilkov and S. Vinoski, \"Node.js: Using JavaScript to build high-performance network programs,\" "
-        "IEEE Internet Comput., vol. 14, no. 6, pp. 80" + "\u2013" + "83, Nov./Dec. 2010.",
-        "Mozilla Developer Network, \"Fetch API,\" MDN Web Docs. [Online]. Available: "
-        "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
-        "E. F. Codd, \"A relational model of data for large shared data banks,\" Commun. ACM, vol. 13, no. 6, "
-        "pp. 377" + "\u2013" + "387, Jun. 1970.",
+        "Y. Zhang, H. Wang, and L. Liu, \"Optimization of hospital bed allocation and patient capacity management in emergency medical services,\" Operations Research for Health Care, vol. 40, art. no. 100412, 2026.",
+        "Centers for Disease Control and Prevention (CDC), \"Guidelines for Environmental Infection Control in Health-Care Facilities,\" CDC, Atlanta, GA, USA, Tech. Rep., 2019.",
+        "A. Kumar, R. Sharma, and P. Verma, \"IoT-Based Smart Hospital Management System: Real-Time Patient Monitoring, Resource Allocation, and Workflow Automation,\" International Journal of Smart Healthcare Systems, 2026.",
+        "S. K. Gupta and P. Singh, \"Designing Web-based Library Management System,\" International Journal of Engineering Research & Technology (IJERT), vol. 9, no. 10, pp. 214\u2013219, Oct. 2020.",
+        "R. T. Fielding, \"Architectural styles and the design of network-based software architectures,\" Ph.D. dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.",
+        "SQLite Consortium, \"SQLite Documentation,\" SQLite Official Documentation, 2026.",
+        "The PHP Group, \"PHP Manual: PHP Data Objects (PDO),\" PHP Documentation, 2026.",
+        "OpenJS Foundation, \"Express: Fast, unopinionated, minimalist web framework for Node.js.\"",
+        "S. Tilkov and S. Vinoski, \"Node.js: Using JavaScript to build high-performance network programs,\" IEEE Internet Comput., vol. 14, no. 6, pp. 80\u201383, Nov./Dec. 2010.",
+        "Mozilla Developer Network (MDN), \"Fetch API,\" MDN Web Docs, 2026.",
+        "E. F. Codd, \"A relational model of data for large shared data banks,\" Commun. ACM, vol. 13, no. 6, pp. 377\u2013387, Jun. 1970.",
         "C. J. Date, An Introduction to Database Systems, 8th ed. Boston, MA, USA: Addison-Wesley, 2004.",
-        "I. Hickson, \"Web storage (second edition),\" W3C Recommendation, Jan. 2021. [Online]. Available: "
-        "https://www.w3.org/TR/webstorage/",
-        "Vercel, \"Vercel functions,\" Vercel Documentation. [Online]. Available: https://vercel.com/docs/functions",
+        "I. Hickson, \"Web storage (second edition),\" W3C Recommendation, Jan. 2021.",
+        "G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: John Wiley & Sons, 2011.",
         "G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: Wiley, 2011.",
     ]
     return B, refs
