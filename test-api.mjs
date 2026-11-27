@@ -1,5 +1,5 @@
 // Test the contagion validation business rule end-to-end.
-const BASE = 'http://localhost:5000';
+const BASE = process.env.BASE || 'http://localhost:5000';
 
 async function post(path, body) {
   const res = await fetch(BASE + path, {

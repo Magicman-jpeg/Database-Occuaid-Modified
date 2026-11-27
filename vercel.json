@@ -3,5 +3,11 @@
   "framework": null,
   "buildCommand": null,
   "installCommand": null,
-  "outputDirectory": "docs"
+  "outputDirectory": "docs",
+  "functions": {
+    "api/*.php": { "runtime": "vercel-php@0.7.4" }
+  },
+  "rewrites": [
+    { "source": "/api/:route*", "destination": "/api/index.php?route=:route*" }
+  ]
 }

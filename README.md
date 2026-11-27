@@ -57,12 +57,11 @@ Then open http://localhost:5000
 
 ---
 
-## PHP backend (alternative)
+## PHP backend (first-class)
 
-Assumption: PHP was added as an alternative backend, not a replacement. The
-`php/` folder implements the same `/api/*` endpoints as `server.js` (same JSON
-shapes, status codes, error messages and the contagion isolation rule) on top of
-the same `hospital.db`.
+PHP is a first-class backend of Occuaid, alongside the Node server. The `php/`
+folder implements the same `/api/*` endpoints as `server.js` (same JSON shapes,
+status codes, error messages and the contagion isolation rule) using PDO SQLite.
 
 ```bash
 # from the project root, needs PHP 8+ with pdo_sqlite
@@ -70,29 +69,44 @@ php -S localhost:8000 php/router.php
 ```
 
 Then open http://localhost:8000. `php/router.php` serves `public/` and sends
-`/api/*` to `php/index.php`. Set `OCCUAID_DB` to use a different SQLite file.
+`/api/*` to `php/index.php`. Set `OCCUAID_DB` to use a different SQLite file. If
+the file does not exist, it is created from `schema.sql` (schema plus seed data).
 
-Note: the PHP files were written without being executed or linted in the
-authoring environment (its PHP binary was broken), so run `php -l php/*.php`
-and `node test-api.mjs` against port 8000 (edit `BASE` in the script) before
-relying on it.
+### Tests
+
+```bash
+PHP_BIN=php tests/run-php-tests.sh
+```
+
+The script runs `php -l` on every PHP file, starts `php -S` on a throwaway
+database (the committed `hospital.db*` files are never touched) and runs
+`tests/php-api.test.mjs`: 21 checks covering the contagion rule, full and
+maintenance rooms, discharge, filters and validation. Result of the latest run:
+all 21 passed, saved in `docs/paper/test-results.txt`. `test-api.mjs` also reads
+`BASE` from the environment (`BASE=http://localhost:8000 node test-api.mjs`).
 
 ---
 
 ## Deploying to Vercel (free Hobby plan)
 
-`vercel.json` deploys the static demo in `docs/` with no build step. It uses
-nothing paid: no cron jobs, no add-ons, no analytics.
+`vercel.json` serves the static demo in `docs/` and runs the PHP API from
+`api/index.php` using the community `vercel-php@0.7.4` runtime. It uses nothing
+paid: no cron jobs, no add-ons, no analytics.
 
 1. Sign in at vercel.com on the free **Hobby** plan and import the GitHub repo
    (or run `npx vercel` from the project root).
-2. Leave the defaults. `vercel.json` sets the output directory to `docs`.
+2. Leave the defaults. `vercel.json` sets the output directory to `docs` and
+   routes `/api/*` to `api/index.php`.
 3. Do not enable any paid add-on or upgrade prompt. Hobby needs no payment method.
 
-Limitation: Vercel serves the static demo only. Its data lives in the visitor's
-browser (`localStorage`, key `occuaid_demo_v1`). The SQLite-backed Node and PHP
-APIs cannot persist data on Vercel serverless, so run them elsewhere or switch to
-an external free database.
+Caveats:
+
+- `vercel-php` is a community runtime. The `api/index.php` entry and the rewrite
+  were checked locally with `php -S`, but the runtime version `0.7.4` could not be
+  verified offline, so check the first deployment's build log.
+- On Vercel the SQLite file lives in `/tmp` and is rebuilt from `schema.sql` on a
+  cold start, so API data is ephemeral. The static `docs/` demo keeps its data in
+  the visitor's browser (`localStorage`, key `occuaid_demo_v1`).
 
 ---
 
