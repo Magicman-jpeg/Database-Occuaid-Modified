@@ -148,7 +148,7 @@ Future work includes user acceptance testing, deploying and verifying the Vercel
 
 ## REFERENCES
 
-[1] Optimizing Hospital Bed Capacity and Resource Allocation Using Inflow and Outflow Indices for Effective Healthcare Management, 2024.  
+[1] J.-N. Kim and I.-H. Oh, "Optimizing hospital bed capacity and resource allocation using inflow and outflow indices for effective healthcare management," INQUIRY: J. Health Care Org., Provision, Financing, vol. 61, 2024, doi: 10.1177/00469580241304244.  
 [2] Centers for Disease Control and Prevention (CDC), "Guidelines for Environmental Infection Control in Health-Care Facilities," CDC, Atlanta, GA, USA, Tech. Rep., 2019.  
 [3] S. Banerjee, "IoT-based smart hospital management system: Real-time patient monitoring, resource allocation, and workflow automation," Int. J. Res. Appl. Sci. Eng. Technol. (IJRASET), vol. 14, pp. 3550–3555, 2026, doi: 10.22214/ijraset.2026.84167.  
 [4] T. W. Araya and A. Mengsteab, "Designing web-based library management system," Int. J. Eng. Res. Technol. (IJERT), vol. 9, no. 10, pp. 272–277, Oct. 2020, doi: 10.17577/IJERTV9IS100131.  
