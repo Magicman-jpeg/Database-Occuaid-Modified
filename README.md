@@ -1,4 +1,4 @@
-# MediCap — Hospital Patient & Room Capacity Management System
+# Occuaid — Hospital Patient & Room Capacity Management System
 
 A full-stack app that manages hospital room/bed capacity with patient case
 tracking, contagion isolation rules, and room amenity management.
@@ -54,6 +54,45 @@ npm run init-db      # creates hospital.db with tables + sample data
 npm start            # starts the server on port 5000
 ```
 Then open http://localhost:5000
+
+---
+
+## PHP backend (alternative)
+
+Assumption: PHP was added as an alternative backend, not a replacement. The
+`php/` folder implements the same `/api/*` endpoints as `server.js` (same JSON
+shapes, status codes, error messages and the contagion isolation rule) on top of
+the same `hospital.db`.
+
+```bash
+# from the project root, needs PHP 8+ with pdo_sqlite
+php -S localhost:8000 php/router.php
+```
+
+Then open http://localhost:8000. `php/router.php` serves `public/` and sends
+`/api/*` to `php/index.php`. Set `OCCUAID_DB` to use a different SQLite file.
+
+Note: the PHP files were written without being executed or linted in the
+authoring environment (its PHP binary was broken), so run `php -l php/*.php`
+and `node test-api.mjs` against port 8000 (edit `BASE` in the script) before
+relying on it.
+
+---
+
+## Deploying to Vercel (free Hobby plan)
+
+`vercel.json` deploys the static demo in `docs/` with no build step. It uses
+nothing paid: no cron jobs, no add-ons, no analytics.
+
+1. Sign in at vercel.com on the free **Hobby** plan and import the GitHub repo
+   (or run `npx vercel` from the project root).
+2. Leave the defaults. `vercel.json` sets the output directory to `docs`.
+3. Do not enable any paid add-on or upgrade prompt. Hobby needs no payment method.
+
+Limitation: Vercel serves the static demo only. Its data lives in the visitor's
+browser (`localStorage`, key `occuaid_demo_v1`). The SQLite-backed Node and PHP
+APIs cannot persist data on Vercel serverless, so run them elsewhere or switch to
+an external free database.
 
 ---
 

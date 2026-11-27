@@ -34,7 +34,7 @@ function mountChrome(active) {
   header.className = 'site-header';
   header.innerHTML = `
     <nav aria-label="Primary" class="site-nav">
-      <a href="index.html" class="brand" aria-label="MediCap home">
+      <a href="index.html" class="brand" aria-label="Occuaid home">
         <span class="brand-mark" aria-hidden="true">+</span>
         <span>Medi<span class="brand-word-accent">Cap</span></span>
       </a>

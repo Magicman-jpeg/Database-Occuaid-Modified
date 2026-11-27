@@ -1,5 +1,5 @@
 // =============================================================
-//  Shared in-browser mock store for the MediCap demo.
+//  Shared in-browser mock store for the Occuaid demo.
 //  Mirrors schema.sql + the Express backend's capacity logic so
 //  every page (dashboard, patients, admissions) stays in sync.
 //
@@ -29,7 +29,7 @@ const SEED = () => ({
   seqAdmission: 0,
 });
 
-const STORAGE_KEY = 'medicap_demo_v1';
+const STORAGE_KEY = 'occuaid_demo_v1';
 
 function save(d) {
   try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch { /* ignore */ }

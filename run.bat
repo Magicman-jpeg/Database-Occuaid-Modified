@@ -1,8 +1,8 @@
 @echo off
-title MediCap Hospital System
+title Occuaid Hospital System
 cd /d "%~dp0"
 
-echo Starting MediCap...
+echo Starting Occuaid...
 echo.
 
 where node >nul 2>nul
@@ -14,7 +14,7 @@ if not exist hospital.db goto init_db
 :start_app
 
 echo ============================================================
-echo   MediCap Hospital Capacity System
+echo   Occuaid Hospital Capacity System
 echo   Browser URL:  http://localhost:5000
 echo   To stop:      Press Ctrl+C or close this window
 echo ============================================================
