@@ -21,9 +21,11 @@ EM = ": "
 
 TITLE = "Occuaid: A Web-based Hospital Patient and Room Capacity Management System"
 AUTHORS = [
-    ("[Author 1 Name]", "[Department, Institution]", "[City, Country]", "[email address]"),
-    ("[Author 2 Name]", "[Department, Institution]", "[City, Country]", "[email address]"),
-    ("[Author 3 Name]", "[Department, Institution]", "[City, Country]", "[email address]"),
+    ("Jay Clifferson P. Arevalo",),
+    ("Christopher Z. Balana",),
+    ("Fiona Lei B. Bravo",),
+    ("Marie Antoinette P. Alpuerto",),
+    ("Victor G. Quirit III",),
 ]
 
 ABSTRACT = (
@@ -104,7 +106,9 @@ def build_content(res):
     p("Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) "
       "room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must "
       "find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, "
-      "the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone.")
+      "the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed capacity planning "
+      "is a long-standing hospital management problem [1], and assigning patients to beds automatically has been "
+      "studied as an optimization task [2].")
     p("Occuaid is a web-based system that keeps the current state of every room, lists the patients and their admissions, "
       "and checks each admission against the placement rules before it is saved. The project has three goals: (1) store "
       "rooms, patients and admissions in a normalized relational database; (2) reject an admission that breaks a rule, "
@@ -116,7 +120,8 @@ def build_content(res):
 
     h1("II. BACKGROUND")
     p("A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private "
-      "bathroom), the bed capacity, and a flag that marks it as an isolation unit. A room has a number, a current occupancy "
+      "bathroom), the bed capacity, and a flag that marks it as an isolation unit, following the guidance on isolation rooms in the CDC environmental infection control "
+      "guidelines [3]. A room has a number, a current occupancy "
       "and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a "
       "contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is "
       "discharged.")
@@ -126,14 +131,15 @@ def build_content(res):
 
     h1("III. LITERATURE REVIEW")
     p("Web-based management systems replace manual record keeping with a shared database and a browser interface. "
-      "The sample paper used as the model for this document, a web-based library management system [1], describes the "
+      "The sample paper used as the model for this document, a web-based library management system [4], describes the "
       "same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid "
-      "applies that approach to hospital rooms instead of library books.")
-    p("SQLite is a self-contained, serverless SQL database engine that stores a database in one file [2]. It supports "
+      "applies that approach to hospital rooms instead of library books. The client and the API communicate through a REST interface, an architectural "
+      "style defined by Fielding [5].")
+    p("SQLite is a self-contained, serverless SQL database engine that stores a database in one file [6]. It supports "
       "CHECK constraints, foreign keys and partial unique indexes, all of which Occuaid uses. PHP accesses databases "
       "through the PDO extension, which provides one interface for several database drivers and supports prepared "
-      "statements [3]. Express is a minimal web framework for Node.js [4]. The browser client calls the API with the "
-      "Fetch API [5].")
+      "statements [7]. Express is a minimal web framework for Node.js [8], a platform that runs JavaScript on the "
+      "server [9]. The browser client calls the API with the Fetch API [10].")
 
     h1("IV. METHODOLOGY")
     h2("A. Database Design")
@@ -142,7 +148,8 @@ def build_content(res):
       "patient occupies a room. One room type has many rooms, one room has many admissions over time, and one patient "
       "has many admissions over time (Fig. 1).")
     B.append(("fig", "Fig. 1.", "Entity relationship diagram of Occuaid (crow's foot shown as 1 to N).", "er"))
-    p("Logical design. The schema is in third normal form. The attributes of each relation are listed in Fig. 1. "
+    p("Logical design. The schema is in third normal form, which rests on the relational model [11] and its normalization "
+      "theory [12]. The attributes of each relation are listed in Fig. 1. "
       "Primary keys are integers. The foreign keys rooms.type_id, admissions.patient_id and admissions.room_id use "
       "ON DELETE RESTRICT so that referenced rows cannot be removed while they are in use.")
     p("Physical design. The schema is implemented in SQLite (schema.sql). Boolean values are stored as integers with "
@@ -156,11 +163,11 @@ def build_content(res):
       "and JavaScript and is served by the Express server. The API tier exists in two implementations with the same "
       "endpoints, JSON shapes, status codes and error messages: server.js (Node.js, Express) and php/index.php (PHP 8, "
       "PDO). The data tier is a single SQLite file. A static demo in docs/ runs entirely in the browser with data in "
-      "sessionStorage and is published on GitHub Pages; it has no server.")
+      "sessionStorage [13] and is published on GitHub Pages; it has no server.")
     B.append(("fig", "Fig. 2.", "System hierarchy of Occuaid.", "arch"))
     p("The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, "
       "api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads "
-      "php/index.php. Vercel runs it through a community PHP runtime. This runtime and its version could not be "
+      "php/index.php. Vercel serverless functions [14] run it through a community PHP runtime. This runtime and its version could not be "
       "verified from the offline environment where the paper was prepared, and data written on Vercel does not persist "
       "between function instances.")
 
@@ -194,7 +201,7 @@ def build_content(res):
     p("The evaluation covers what was actually run. All tests target the PHP API, because the Node.js dependencies "
       "(Express) could not be installed in the offline environment, so server.js was not executed.")
     h2("A. Unit Testing")
-    p("Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and "
+    p("Testing follows the general guidance on software testing in [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and "
       "api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the "
       "API tests below.")
     h2("B. Integration Testing")
@@ -230,15 +237,32 @@ def build_content(res):
       "database for the hosted version, user login and roles, and room transfer between admissions.")
 
     refs = [
-        "[Authors, confirm], \"Designing Web-based Library Management System,\" International Journal of Engineering "
-        "Research and Technology (IJERT), vol. 9, no. 10, 2020. [CONFIRM authors and page numbers]",
-        "SQLite Consortium, \"SQLite Documentation.\" [Online]. Available: https://www.sqlite.org/docs.html",
-        "The PHP Group, \"PHP Manual: PHP Data Objects (PDO).\" [Online]. Available: "
+        "L. V. Green, \"How many hospital beds?\" Inquiry, vol. 39, no. 4, pp. 400" + "\u2013" + "412, 2002.",
+        "P. Demeester, W. Souffriau, P. De Causmaecker, and G. Vanden Berghe, \"A hybrid tabu search algorithm for "
+        "automatically assigning patients to beds,\" Artif. Intell. Med., vol. 48, no. 1, pp. 61" + "\u2013" + "70, Jan. 2010.",
+        "L. Sehulster and R. Y. W. Chinn, \"Guidelines for environmental infection control in health-care facilities: "
+        "Recommendations of CDC and the Healthcare Infection Control Practices Advisory Committee (HICPAC),\" "
+        "MMWR Recomm. Rep., vol. 52, no. RR-10, pp. 1" + "\u2013" + "42, Jun. 2003.",
+        "T. W. Araya and A. Mengsteab, \"Designing web-based library management system,\" Int. J. Eng. Res. Technol. "
+        "(IJERT), vol. 9, no. 10, pp. 272" + "\u2013" + "277, Oct. 2020.",
+        "R. T. Fielding, \"Architectural styles and the design of network-based software architectures,\" Ph.D. "
+        "dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.",
+        "SQLite, \"SQLite documentation.\" [Online]. Available: https://www.sqlite.org/docs.html",
+        "The PHP Group, \"PHP manual: PHP data objects (PDO).\" [Online]. Available: "
         "https://www.php.net/manual/en/book.pdo.php",
         "OpenJS Foundation, \"Express: Fast, unopinionated, minimalist web framework for Node.js.\" [Online]. "
         "Available: https://expressjs.com",
-        "Mozilla Developer Network, \"Fetch API.\" [Online]. Available: "
+        "S. Tilkov and S. Vinoski, \"Node.js: Using JavaScript to build high-performance network programs,\" "
+        "IEEE Internet Comput., vol. 14, no. 6, pp. 80" + "\u2013" + "83, Nov./Dec. 2010.",
+        "Mozilla Developer Network, \"Fetch API,\" MDN Web Docs. [Online]. Available: "
         "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
+        "E. F. Codd, \"A relational model of data for large shared data banks,\" Commun. ACM, vol. 13, no. 6, "
+        "pp. 377" + "\u2013" + "387, Jun. 1970.",
+        "C. J. Date, An Introduction to Database Systems, 8th ed. Boston, MA, USA: Addison-Wesley, 2004.",
+        "I. Hickson, \"Web storage (second edition),\" W3C Recommendation, Jan. 2021. [Online]. Available: "
+        "https://www.w3.org/TR/webstorage/",
+        "Vercel, \"Vercel functions,\" Vercel Documentation. [Online]. Available: https://vercel.com/docs/functions",
+        "G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: Wiley, 2011.",
     ]
     return B, refs
 
@@ -420,7 +444,7 @@ def build_document(blocks, refs, rows_header):
             if key == "flow":
                 widths = [COL_W]
                 rows = [[(t, 1)] for (t, s) in [r[0] for r in rows]]
-            body.append(table(rows, len(widths), widths, size=15, jc="center"))
+            body.append(table(rows, len(widths), widths, size=16, jc="center"))
             body.append(para([run(label + " ", size=16), run(cap, size=16)], jc="center", before=60, after=120))
         elif kind == "table":
             _, label, cap, head, rows = blk
@@ -428,7 +452,7 @@ def build_document(blocks, refs, rows_header):
             body.append(para([run(cap, size=16, smallcaps=True)], jc="center", after=60, keep_next=True))
             widths = [520, 800, 1000, 1040, 1540]
             allrows = [[(h, 1) for h in head]] + [[(c, 1) for c in r] for r in rows]
-            body.append(table(allrows, 5, widths, header=True, size=14, jc="left"))
+            body.append(table(allrows, 5, widths, header=True, size=16, jc="left"))
             body.append(para([run("", size=8)], after=80))
     # references
     body.append(para([run("REFERENCES", size=20)], jc="center", before=160, after=80, keep_next=True))
@@ -510,7 +534,7 @@ def write_docx(blocks, refs):
 def write_md(blocks, refs):
     L = ["# " + TITLE, ""]
     for a in AUTHORS:
-        L.append("%s, %s, %s, %s  " % a)
+        L.append(", ".join(a) + "  ")
     L += ["", "**Abstract" + EM + "** " + ABSTRACT, "", "**Keywords" + EM + "** " + KEYWORDS, ""]
     for blk in blocks:
         k = blk[0]

@@ -1,8 +1,10 @@
 # Occuaid: A Web-based Hospital Patient and Room Capacity Management System
 
-[Author 1 Name], [Department, Institution], [City, Country], [email address]  
-[Author 2 Name], [Department, Institution], [City, Country], [email address]  
-[Author 3 Name], [Department, Institution], [City, Country], [email address]  
+Jay Clifferson P. Arevalo  
+Christopher Z. Balana  
+Fiona Lei B. Bravo  
+Marie Antoinette P. Alpuerto  
+Victor G. Quirit III  
 
 **Abstract: ** Hospital staff need to know quickly which rooms can accept a new patient, and contagious patients must never be placed in shared rooms. This paper presents Occuaid, a web-based system that tracks rooms, patients and admissions and enforces these placement rules in the server. The system uses a four-table SQLite database (room_types, rooms, patients, admissions), an HTML and JavaScript client, and a REST API implemented twice: in Node.js with Express and in PHP with PDO. The PHP API is the backend that was run and tested for this paper and is the one deployed to Vercel as a serverless function. A suite of 21 automated HTTP checks was run against the PHP API on a fresh database; all 21 passed. User acceptance testing has not been conducted.
 
@@ -10,7 +12,7 @@
 
 ## I. INTRODUCTION
 
-Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone.
+Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed capacity planning is a long-standing hospital management problem [1], and assigning patients to beds automatically has been studied as an optimization task [2].
 
 Occuaid is a web-based system that keeps the current state of every room, lists the patients and their admissions, and checks each admission against the placement rules before it is saved. The project has three goals: (1) store rooms, patients and admissions in a normalized relational database; (2) reject an admission that breaks a rule, namely a full room, a room in maintenance, or a contagious patient outside an isolation room; and (3) give staff a browser dashboard that shows capacity at a glance.
 
@@ -18,15 +20,15 @@ The design parameters of the system are PHP for the server-side API, SQLite for 
 
 ## II. BACKGROUND
 
-A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private bathroom), the bed capacity, and a flag that marks it as an isolation unit. A room has a number, a current occupancy and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is discharged.
+A room in Occuaid belongs to a room type. The room type holds the amenities (air conditioning, television, private bathroom), the bed capacity, and a flag that marks it as an isolation unit, following the guidance on isolation rooms in the CDC environmental infection control guidelines [3]. A room has a number, a current occupancy and a status of Available, Full or Maintenance. A patient record holds the name, contact number, medical case and a contagious flag. An admission links one patient to one room over a period of time and is Active until the patient is discharged.
 
 The schema follows the principle stated in schema.sql, "walang labis, walang kulang" (nothing superfluous, nothing missing). Bed capacity is stored once per room type and is not repeated in each room, which avoids duplicated data.
 
 ## III. LITERATURE REVIEW
 
-Web-based management systems replace manual record keeping with a shared database and a browser interface. The sample paper used as the model for this document, a web-based library management system [1], describes the same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid applies that approach to hospital rooms instead of library books.
+Web-based management systems replace manual record keeping with a shared database and a browser interface. The sample paper used as the model for this document, a web-based library management system [4], describes the same kind of workflow: a relational database, a server-side language, and an HTML front end for staff. Occuaid applies that approach to hospital rooms instead of library books. The client and the API communicate through a REST interface, an architectural style defined by Fielding [5].
 
-SQLite is a self-contained, serverless SQL database engine that stores a database in one file [2]. It supports CHECK constraints, foreign keys and partial unique indexes, all of which Occuaid uses. PHP accesses databases through the PDO extension, which provides one interface for several database drivers and supports prepared statements [3]. Express is a minimal web framework for Node.js [4]. The browser client calls the API with the Fetch API [5].
+SQLite is a self-contained, serverless SQL database engine that stores a database in one file [6]. It supports CHECK constraints, foreign keys and partial unique indexes, all of which Occuaid uses. PHP accesses databases through the PDO extension, which provides one interface for several database drivers and supports prepared statements [7]. Express is a minimal web framework for Node.js [8], a platform that runs JavaScript on the server [9]. The browser client calls the API with the Fetch API [10].
 
 ## IV. METHODOLOGY
 
@@ -45,13 +47,13 @@ patients (PK patient_id) | first_name, last_name, contact_number, medical_case, 
 ```
 *Fig. 1. Entity relationship diagram of Occuaid (crow's foot shown as 1 to N).*
 
-Logical design. The schema is in third normal form. The attributes of each relation are listed in Fig. 1. Primary keys are integers. The foreign keys rooms.type_id, admissions.patient_id and admissions.room_id use ON DELETE RESTRICT so that referenced rows cannot be removed while they are in use.
+Logical design. The schema is in third normal form, which rests on the relational model [11] and its normalization theory [12]. The attributes of each relation are listed in Fig. 1. Primary keys are integers. The foreign keys rooms.type_id, admissions.patient_id and admissions.room_id use ON DELETE RESTRICT so that referenced rows cannot be removed while they are in use.
 
 Physical design. The schema is implemented in SQLite (schema.sql). Boolean values are stored as integers with CHECK (x IN (0, 1)). Room status and admission status are text columns restricted by CHECK constraints to the allowed values. A partial unique index, uq_patient_active_admission on admissions(patient_id) WHERE status = 'Active', guarantees that a patient has at most one active admission. Two further indexes speed up lookups by room and by status. The file also seeds five room types, nine rooms, five patients and three active admissions.
 
 ### B. Architecture Design
 
-Occuaid has a client tier, an API tier and a data tier (Fig. 2). The browser client in public/ is plain HTML, CSS and JavaScript and is served by the Express server. The API tier exists in two implementations with the same endpoints, JSON shapes, status codes and error messages: server.js (Node.js, Express) and php/index.php (PHP 8, PDO). The data tier is a single SQLite file. A static demo in docs/ runs entirely in the browser with data in sessionStorage and is published on GitHub Pages; it has no server.
+Occuaid has a client tier, an API tier and a data tier (Fig. 2). The browser client in public/ is plain HTML, CSS and JavaScript and is served by the Express server. The API tier exists in two implementations with the same endpoints, JSON shapes, status codes and error messages: server.js (Node.js, Express) and php/index.php (PHP 8, PDO). The data tier is a single SQLite file. A static demo in docs/ runs entirely in the browser with data in sessionStorage [13] and is published on GitHub Pages; it has no server.
 
 ```
 CLIENT: Browser (HTML, CSS, JavaScript) | public/ (Express client), docs/ (static demo)
@@ -63,7 +65,7 @@ Static demo: docs/ on GitHub Pages, data in sessionStorage, no server
 ```
 *Fig. 2. System hierarchy of Occuaid.*
 
-The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads php/index.php. Vercel runs it through a community PHP runtime. This runtime and its version could not be verified from the offline environment where the paper was prepared, and data written on Vercel does not persist between function instances.
+The PHP API can be run locally with the built-in server (php -S localhost:8000 php/router.php). For deployment, api/index.php is a Vercel serverless entry that copies the database to the writable /tmp directory and loads php/index.php. Vercel serverless functions [14] run it through a community PHP runtime. This runtime and its version could not be verified from the offline environment where the paper was prepared, and data written on Vercel does not persist between function instances.
 
 ### C. Interface Design
 
@@ -96,7 +98,7 @@ The evaluation covers what was actually run. All tests target the PHP API, becau
 
 ### A. Unit Testing
 
-Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
+Testing follows the general guidance on software testing in [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
 
 ### B. Integration Testing
 
@@ -146,8 +148,18 @@ Future work includes user acceptance testing, deploying and verifying the Vercel
 
 ## REFERENCES
 
-[1] [Authors, confirm], "Designing Web-based Library Management System," International Journal of Engineering Research and Technology (IJERT), vol. 9, no. 10, 2020. [CONFIRM authors and page numbers]  
-[2] SQLite Consortium, "SQLite Documentation." [Online]. Available: https://www.sqlite.org/docs.html  
-[3] The PHP Group, "PHP Manual: PHP Data Objects (PDO)." [Online]. Available: https://www.php.net/manual/en/book.pdo.php  
-[4] OpenJS Foundation, "Express: Fast, unopinionated, minimalist web framework for Node.js." [Online]. Available: https://expressjs.com  
-[5] Mozilla Developer Network, "Fetch API." [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API  
+[1] L. V. Green, "How many hospital beds?" Inquiry, vol. 39, no. 4, pp. 400–412, 2002.  
+[2] P. Demeester, W. Souffriau, P. De Causmaecker, and G. Vanden Berghe, "A hybrid tabu search algorithm for automatically assigning patients to beds," Artif. Intell. Med., vol. 48, no. 1, pp. 61–70, Jan. 2010.  
+[3] L. Sehulster and R. Y. W. Chinn, "Guidelines for environmental infection control in health-care facilities: Recommendations of CDC and the Healthcare Infection Control Practices Advisory Committee (HICPAC)," MMWR Recomm. Rep., vol. 52, no. RR-10, pp. 1–42, Jun. 2003.  
+[4] T. W. Araya and A. Mengsteab, "Designing web-based library management system," Int. J. Eng. Res. Technol. (IJERT), vol. 9, no. 10, pp. 272–277, Oct. 2020.  
+[5] R. T. Fielding, "Architectural styles and the design of network-based software architectures," Ph.D. dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.  
+[6] SQLite, "SQLite documentation." [Online]. Available: https://www.sqlite.org/docs.html  
+[7] The PHP Group, "PHP manual: PHP data objects (PDO)." [Online]. Available: https://www.php.net/manual/en/book.pdo.php  
+[8] OpenJS Foundation, "Express: Fast, unopinionated, minimalist web framework for Node.js." [Online]. Available: https://expressjs.com  
+[9] S. Tilkov and S. Vinoski, "Node.js: Using JavaScript to build high-performance network programs," IEEE Internet Comput., vol. 14, no. 6, pp. 80–83, Nov./Dec. 2010.  
+[10] Mozilla Developer Network, "Fetch API," MDN Web Docs. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API  
+[11] E. F. Codd, "A relational model of data for large shared data banks," Commun. ACM, vol. 13, no. 6, pp. 377–387, Jun. 1970.  
+[12] C. J. Date, An Introduction to Database Systems, 8th ed. Boston, MA, USA: Addison-Wesley, 2004.  
+[13] I. Hickson, "Web storage (second edition)," W3C Recommendation, Jan. 2021. [Online]. Available: https://www.w3.org/TR/webstorage/  
+[14] Vercel, "Vercel functions," Vercel Documentation. [Online]. Available: https://vercel.com/docs/functions  
+[15] G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: Wiley, 2011.  
