@@ -1,0 +1,29 @@
+PHP 8.4.27 (cli) (built: Oct 23 2026 00:03:04) (NTS)
+No syntax errors detected in php/db.php
+No syntax errors detected in php/index.php
+No syntax errors detected in php/router.php
+No syntax errors detected in api/index.php
+--- tests/php-api.test.mjs
+PASS  GET /api/health
+PASS  GET /api/room-types returns 5 types
+PASS  GET /api/rooms returns 9 rooms  (got 9)
+PASS  contagious -> non-isolation room is rejected with 409  (409 Contagious patients can only be assigned to Isolation units. "ICU" is not an isolation room.)
+PASS  contagious -> isolation room is accepted with 201  (201)
+PASS  admission into a full room is rejected with 409  (409 Room is already full.)
+PASS  non-contagious -> regular room is accepted with 201  (201)
+PASS  missing first_name is rejected with 400  (400)
+PASS  unknown room is rejected with 404  (404)
+PASS  type filter returns only Isolation rooms
+PASS  ISO-502 now Full
+PASS  aircon filter returns only aircon rooms  (7 rooms)
+PASS  discharge succeeds  (200)
+PASS  second discharge is rejected with 409  (409)
+PASS  ISO-502 Available after discharge
+PASS  set room to Maintenance
+PASS  admission into Maintenance room is rejected with 409  (409)
+PASS  invalid room status is rejected with 400
+PASS  GET /api/admissions active list
+PASS  GET /api/patients list
+PASS  unknown route returns 404
+
+All checks passed
