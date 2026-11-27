@@ -12,7 +12,7 @@ Victor G. Quirit III
 
 ## I. INTRODUCTION
 
-Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Bed allocation and patient capacity management is a long-standing hospital management problem [1].
+Hospitals have a limited number of beds, and the beds differ by room type. An intensive care unit (ICU) room may hold five patients, a private room one, and a general ward eight. When a patient arrives, staff must find a room that has a free bed, is not under maintenance, and suits the patient. If the patient is contagious, the room must be a single-occupancy isolation room. Doing this from paper lists or memory is slow and error prone. Hospital bed capacity and resource allocation are central to healthcare management [1].
 
 Occuaid is a web-based system that keeps the current state of every room, lists the patients and their admissions, and checks each admission against the placement rules before it is saved. The project has three goals: (1) store rooms, patients and admissions in a normalized relational database; (2) reject an admission that breaks a rule, namely a full room, a room in maintenance, or a contagious patient outside an isolation room; and (3) give staff a browser dashboard that shows capacity at a glance.
 
@@ -94,11 +94,11 @@ The other modules are discharge (PATCH /api/admissions/:id/discharge), which clo
 
 ## V. EVALUATION METHOD
 
-The evaluation covers what was actually run. All tests target the PHP API, because the Node.js dependencies (Express) could not be installed in the offline environment, so server.js was not executed.
+The evaluation covers what was actually run. All tests target the PHP API, because the Node.js dependencies (Express) could not be installed in the offline environment, so server.js was not executed. The test levels used here (unit checks and integration tests) follow the usual categories and levels of software testing [14], [15].
 
 ### A. Unit Testing
 
-Testing follows the general guidance on software testing in [14], [15]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
+Testing follows the general guidance on software testing in [14]. Each PHP file was checked for syntax errors with php -l (php/db.php, php/index.php, php/router.php and api/index.php). No separate unit test framework was used. Database constraints are exercised indirectly by the API tests below.
 
 ### B. Integration Testing
 
@@ -148,10 +148,10 @@ Future work includes user acceptance testing, deploying and verifying the Vercel
 
 ## REFERENCES
 
-[1] Y. Zhang, H. Wang, and L. Liu, "Optimization of hospital bed allocation and patient capacity management in emergency medical services," Operations Research for Health Care, vol. 40, art. no. 100412, 2026.  
+[1] Optimizing Hospital Bed Capacity and Resource Allocation Using Inflow and Outflow Indices for Effective Healthcare Management, 2024.  
 [2] Centers for Disease Control and Prevention (CDC), "Guidelines for Environmental Infection Control in Health-Care Facilities," CDC, Atlanta, GA, USA, Tech. Rep., 2019.  
-[3] A. Kumar, R. Sharma, and P. Verma, "IoT-Based Smart Hospital Management System: Real-Time Patient Monitoring, Resource Allocation, and Workflow Automation," International Journal of Smart Healthcare Systems, 2026.  
-[4] S. K. Gupta and P. Singh, "Designing Web-based Library Management System," International Journal of Engineering Research & Technology (IJERT), vol. 9, no. 10, pp. 214–219, Oct. 2020.  
+[3] S. Banerjee, "IoT-based smart hospital management system: Real-time patient monitoring, resource allocation, and workflow automation," Int. J. Res. Appl. Sci. Eng. Technol. (IJRASET), vol. 14, pp. 3550–3555, 2026, doi: 10.22214/ijraset.2026.84167.  
+[4] T. W. Araya and A. Mengsteab, "Designing web-based library management system," Int. J. Eng. Res. Technol. (IJERT), vol. 9, no. 10, pp. 272–277, Oct. 2020, doi: 10.17577/IJERTV9IS100131.  
 [5] R. T. Fielding, "Architectural styles and the design of network-based software architectures," Ph.D. dissertation, Dept. Inf. Comput. Sci., Univ. California, Irvine, CA, USA, 2000.  
 [6] SQLite Consortium, "SQLite Documentation," SQLite Official Documentation, 2026.  
 [7] The PHP Group, "PHP Manual: PHP Data Objects (PDO)," PHP Documentation, 2026.  
@@ -162,4 +162,4 @@ Future work includes user acceptance testing, deploying and verifying the Vercel
 [12] C. J. Date, An Introduction to Database Systems, 8th ed. Boston, MA, USA: Addison-Wesley, 2004.  
 [13] I. Hickson, "Web storage (second edition)," W3C Recommendation, Jan. 2021.  
 [14] G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: John Wiley & Sons, 2011.  
-[15] G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing, 3rd ed. Hoboken, NJ, USA: Wiley, 2011.  
+[15] M. A. Umar, "A study of software testing: Categories, levels, techniques, and types," TechRxiv, 2020, doi: 10.36227/techrxiv.12578714.v1.  
