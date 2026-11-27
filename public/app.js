@@ -1,5 +1,5 @@
 // =============================================================
-//  MediCap dashboard — connected client logic (Fetch API)
+//  Occuaid dashboard — connected client logic (Fetch API)
 //  Pages: Dashboard, Patients, Admissions
 // =============================================================
 const $  = (sel, root = document) => root.querySelector(sel);
