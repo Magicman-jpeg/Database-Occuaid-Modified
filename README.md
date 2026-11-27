@@ -3,7 +3,24 @@
 A full-stack app that manages hospital room/bed capacity with patient case
 tracking, contagion isolation rules, and room amenity management.
 
-**Stack:** Node.js (Express) · SQLite (local file) · HTML + Tailwind (CDN) + vanilla JS (Fetch API).
+**Stack:** PHP (PDO) and Node.js (Express) backends · SQLite (local file) · HTML + Tailwind (CDN) + vanilla JS (Fetch API).
+
+## Project layout
+
+| Path | What it is |
+|------|------------|
+| `php/` | PHP backend: `/api/*` endpoints (`index.php`), PDO SQLite connection (`db.php`), dev-server router (`router.php`) |
+| `api/index.php` | Vercel entry point for the PHP API |
+| `server.js`, `db.js`, `init-db.js` | Node.js (Express) backend with the same API |
+| `schema.sql` | Database schema and sample data |
+| `public/` | Web client served by the PHP and Node servers |
+| `docs/` | Deployed site (Vercel and GitHub Pages); runs in the browser with demo data |
+| `docs/paper/` | Research paper (`Occuaid_Paper.docx`), its build script and the recorded test results |
+| `tests/` | API tests for the PHP and Node backends |
+| `run.bat` | Windows one-click launcher for the Node server |
+
+`hospital.db` is not stored in the repository. Both backends create it from
+`schema.sql` the first time they run.
 
 ---
 
@@ -79,11 +96,11 @@ PHP_BIN=php tests/run-php-tests.sh
 ```
 
 The script runs `php -l` on every PHP file, starts `php -S` on a throwaway
-database (the committed `hospital.db*` files are never touched) and runs
+database (your local `hospital.db` is never touched) and runs
 `tests/php-api.test.mjs`: 21 checks covering the contagion rule, full and
 maintenance rooms, discharge, filters and validation. Result of the latest run:
-all 21 passed, saved in `docs/paper/test-results.txt`. `test-api.mjs` also reads
-`BASE` from the environment (`BASE=http://localhost:8000 node test-api.mjs`).
+all 21 passed, saved in `docs/paper/test-results.txt`. `tests/node-api.test.mjs` also reads
+`BASE` from the environment (`BASE=http://localhost:8000 node tests/node-api.test.mjs`).
 
 ---
 
@@ -107,30 +124,6 @@ Caveats:
 - On Vercel the SQLite file lives in `/tmp` and is rebuilt from `schema.sql` on a
   cold start, so API data is ephemeral. The static `docs/` demo keeps its data in
   the visitor's browser (`localStorage`, key `occuaid_demo_v1`).
-
----
-
-## How to replace existing files
-
-If you downloaded the original repo and want to apply this refactor:
-
-1. **Backup** the original folder (optional).
-2. **Overwrite** these files with the new versions:
-   - `schema.sql` — new SQLite schema (replaces the MySQL schema)
-   - `db.js` — SQLite connection (replaces the MySQL pool)
-   - `server.js` — updated API with contagion validation + amenity routes
-   - `package.json` — updated dependencies (SQLite instead of MySQL)
-   - `public/index.html` — updated UI with new form fields + filters
-   - `public/app.js` — updated client logic
-   - `public/style.css` — appended new styles for amenities/contagion
-3. **Add** the new files:
-   - `init-db.js` — standalone database initialiser
-   - `run.bat` — Windows one-click launcher
-4. **Delete** the old lock file if it exists: `package-lock.json` (will be regenerated).
-5. **Delete** `.env` and `.env.example` if present — they are no longer needed
-   (SQLite needs no credentials; the port defaults to 5000).
-6. **Delete** the old MySQL database if you had one — it is no longer used.
-7. Run `run.bat` (or `npm install && npm run init-db && npm start`).
 
 ---
 
@@ -221,7 +214,7 @@ admission/discharge, the counts can never drift out of sync.
 - Zero cloud dependencies — the entire system runs locally with a single
   SQLite file (`hospital.db`). No AWS, Firebase, or external database.
 - All file paths are relative; the project runs from any folder.
-- The `docs/` folder contains the old GitHub Pages demo (unchanged, in-browser
-  mock data) and is not required for local operation.
+- The `docs/` folder is the deployed site on Vercel and GitHub Pages. It runs
+  entirely in the browser with demo data and is not required for local operation.
 - This is sample/demo software. For real clinical use you'd add
   authentication, audit logging, and data-privacy controls.

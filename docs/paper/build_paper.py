@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build docs/paper/Occuaid_Paper.docx (IEEE two-column style) and Occuaid_Paper.md.
+"""Build docs/paper/Occuaid_Paper.docx (IEEE two-column style).
 
 Standard library only: the .docx is hand-written OOXML inside a zip.
 Table I "Actual Result" values are read from docs/paper/test-results.txt,
@@ -14,7 +14,6 @@ from xml.sax.saxutils import escape
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DOCX = os.path.join(HERE, "Occuaid_Paper.docx")
-OUT_MD = os.path.join(HERE, "Occuaid_Paper.md")
 RESULTS = os.path.join(HERE, "test-results.txt")
 
 EM = ": "
@@ -518,42 +517,11 @@ def write_docx(blocks, refs):
             z.writestr(zi, data.encode("utf-8"))
 
 
-# ------------------------------------------------------------------
-# Markdown source
-# ------------------------------------------------------------------
-def write_md(blocks, refs):
-    L = ["# " + TITLE, ""]
-    for a in AUTHORS:
-        L.append(", ".join(a) + "  ")
-    L += ["", "**Abstract" + EM + "** " + ABSTRACT, "", "**Keywords" + EM + "** " + KEYWORDS, ""]
-    for blk in blocks:
-        k = blk[0]
-        if k == "h1":
-            L += ["## " + blk[1], ""]
-        elif k == "h2":
-            L += ["### " + blk[1], ""]
-        elif k == "p":
-            L += [blk[1], ""]
-        elif k == "fig":
-            _, label, cap, key = blk
-            L += ["```", *[" | ".join(t for t, _ in r) for r in FIGS[key]], "```", "*%s %s*" % (label, cap), ""]
-        elif k == "table":
-            _, label, cap, head, rows = blk
-            L += ["**%s: %s**" % (label, cap), "", "| " + " | ".join(head) + " |",
-                  "|" + "---|" * len(head)]
-            L += ["| " + " | ".join(r) + " |" for r in rows] + [""]
-    L += ["## REFERENCES", ""]
-    L += ["[%d] %s  " % (i, r) for i, r in enumerate(refs, 1)]
-    with open(OUT_MD, "w", encoding="utf-8") as f:
-        f.write("\n".join(L) + "\n")
-
-
 def main():
     res = load_results()
     blocks, refs = build_content(res)
     write_docx(blocks, refs)
-    write_md(blocks, refs)
-    print("wrote", OUT_DOCX, "and", OUT_MD)
+    print("wrote", OUT_DOCX)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the API tests against the PHP backend using a throwaway database.
-# The committed hospital.db* files are never touched.
+# Your local hospital.db is never touched.
 # Optional: PHP_BIN=/path/to/php PORT=8000
 set -u
 cd "$(dirname "$0")/.."
