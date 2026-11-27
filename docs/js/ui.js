@@ -36,7 +36,7 @@ function mountChrome(active) {
     <nav aria-label="Primary" class="site-nav">
       <a href="index.html" class="brand" aria-label="Occuaid home">
         <span class="brand-mark" aria-hidden="true">+</span>
-        <span>Medi<span class="brand-word-accent">Cap</span></span>
+        <span>Occu<span class="brand-word-accent">aid</span></span>
       </a>
       <ul class="nav-list">
         ${PAGES.map(page => `
